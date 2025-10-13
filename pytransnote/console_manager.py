@@ -1,15 +1,24 @@
 from manager import my_translator
 from rich.console import Console
 from rich.panel import Panel
+from history_manager import history_manager_class as hist
 
 console = Console()
+## instantiate an Console obj from rich Console
 
 class console_view(my_translator):
     def __init__(self):
         super().__init__()
+        self.hist_file=hist()
+        if(not self.hist_file.read_and_load_data()):
+            print("History file not found or was empty!.\nNew one will be created after this session closes containing data of this session")
+        self.current_max_id=self.hist_file.max_id+1
+        
 
     available_langs=(
     'english',
+    'hindi',
+    'marathi',
     'spanish',
     'french',
     'german',
@@ -58,8 +67,18 @@ class console_view(my_translator):
         if not sentence:
             console.print(Panel(":x: [bold red]No text entered. Cannot perform translation.[/bold red]", border_style="red"))
         try:
-            console.print(f"[green] {self.translation(sentence)}")
+            ts=self.translation(sentence)
+            console.print(f"[green] {ts}")
             console.print(Panel(f":white_check_mark: [bold green]Translation Successful![/bold green]\n[bold cyan][/bold cyan]", border_style="green"))
+            data_to_dump={
+                "ID":self.current_max_id,
+                "Base Lang":self.__from_lang,
+                "Target Language":self.__to_lang,
+                "Translated_String":ts
+            }
+            self.hist_file.save_data(data_to_dump)
+            self.current_max_id+=1
+        
         except Exception as e:
             error_message = """
             [bold red]An error occurred. Sorry about that! :([/bold red]
