@@ -17,7 +17,7 @@ class history_manager_class():
                 else:
                     self.history_list.append(data)
                 m_id=[item.get("ID",0) for item in self.history_list]
-                self.max_id=max(m_id)
+                self.max_id=max(m_id,default=0)
 
                 return True
         except (FileNotFoundError, json.JSONDecodeError):
