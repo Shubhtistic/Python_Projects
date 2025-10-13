@@ -8,7 +8,7 @@ class history_manager_class():
 
     def read_and_load_data(self):
         try:
-            with open("history.json", "r",encoding='utf8') as file:
+            with open(".history.json", "r",encoding='utf8') as file:
                 data = json.load(file)
                 if isinstance(data, list):
                     self.history_list.extend(data)
@@ -26,7 +26,7 @@ class history_manager_class():
 
 
     def save_data(self):
-        with open("history.json","w") as file:
+        with open(".history.json","w") as file:
             json.dump(self.history_list,file,indent=4)
             ## at program end we simply dump entire file into the json file
 
