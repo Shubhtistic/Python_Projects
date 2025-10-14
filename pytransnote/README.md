@@ -50,7 +50,7 @@ This project was architected to demonstrate a strong command of modern Python an
 ### Installation & Setup
 1.  **Clone the repository:**
     ```bash
-    git clone git@github.com:shubh4m-2k04/Python_Projects.git
+    git clone git@github.com:Shubhtistic/Python_Projects.git
     cd pytransnote
     ```
 2.  **Create and activate the virtual environment:**
