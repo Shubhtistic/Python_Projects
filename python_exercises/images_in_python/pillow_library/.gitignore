@@ -1,0 +1,15 @@
+# Ignore all jpgs and pngs
+*.jpg
+*.png
+
+# Do not ignore specific images
+!sample1.jpeg
+!src_image/sample2.jpeg
+!src_image/sample3.jpeg
+
+# Keep the src_image folder (track everything inside)
+!src_image/
+
+# Ignore the watermark_images folder and all its files
+/watermarked_images/
+watermarked_images/*
