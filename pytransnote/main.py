@@ -25,35 +25,47 @@ welcome_text = Text()
 welcome_text.append("🚀 Welcome to PyTransNote! 🚀\n", style="bold yellow")
 welcome_text.append("Your Python CLI Translator with deep_translator support.\n", style="bold white")
 welcome_text.append("Enjoy translating text across multiple languages easily!", style="bold white")
-console.print(Panel(welcome_text, style="bold blue", border_style="cyan"))
+console.print(Panel(welcome_text, style="bold blue", border_style="cyan",expand=False),justify="center")
 
 # our features
-console.print("[bold green]Features:[/bold green]")
-console.print("• Uses deep_translator for accurate translations")
-console.print("• Maintains translation history automatically")
-console.print("• Supports multiple languages: English, Spanish, French, German, etc.")
-console.print("• Lightweight and easy to use")
-console.print("• Session history saved automatically at program end\n")
+features_text = Text()
+features_text.append("Features:\n", style="bold green")
+features_text.append("• Uses deep_translator for accurate translations\n", style="gold")
+features_text.append("• Maintains translation history automatically\n", style="gold")
+features_text.append("• Supports multiple languages: English, Spanish, French, German, etc.\n", style="gold")
+features_text.append("• Lightweight and easy to use\n", style="gold")
+features_text.append("• Session history saved automatically at program end\n", style="gold")
 
-## ----------------------
+console.print(Panel(features_text, style="bold blue", border_style="cyan", expand=False),justify="center")
 
-console.print(Panel("Let's start translating! 🚀", style="bold white on blue", expand=False))
+
+console.print(Panel("Let's start translating! 🚀", style="bold white on blue", expand=False),justify="center")
 console.print("\n")
 
 ## main console object
 my_console=console_class()
 
 my_console.enter_user_name()
+reminder_text = Text()
+reminder_text.append("Do configure the languages before using\n", style="bold yellow")
+reminder_text.append("Default is English → Spanish", style="bold white")
+
+console.print(Panel(reminder_text, style="bold black on bright_magenta", border_style="bright_yellow", expand=False),justify="center")
+
 
 ## main console object
 while True:
-    console.print("\n[bold cyan]--- PyTransNote Main Menu ---\nDo Configure the languages Before using, the Default is English To Spanish[/bold cyan]")
-    console.print("1. Translate New Text")
-    console.print("2. Configure Languages")
-    console.print("3. Delete a Specific Translation")
-    console.print("4. View Translation History")
-    console.print("5. Clear All History")
-    console.print("6. Exit")
+    menu_text = Text()
+    menu_text.append("--- PyTransNote Main Menu ---\n", style="bold cyan")
+    menu_text.append("1. Translate New Text\n", style="white")
+    menu_text.append("2. Configure Languages\n", style="white")
+    menu_text.append("3. Delete a Specific Translation\n", style="white")
+    menu_text.append("4. View Translation History\n", style="white")
+    menu_text.append("5. Clear All History\n", style="white")
+    menu_text.append("6. Exit\n", style="white")
+
+    console.print(Panel(menu_text, style="bold blue", border_style="cyan", expand=False),justify="center")
+
 
     choice = console.input("\n[bold yellow]Enter your choice (1-6): [/bold yellow]").strip()
 
