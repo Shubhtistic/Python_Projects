@@ -5,7 +5,7 @@
 **License:** MIT License
 
 ## Overview
-PyTBot is a modular, multi-function Python bot for X (Formely Twitter) automation.  
+XPyBot is a modular, multi-function Python bot for X (Formely Twitter) automation.  
 This project is for learning purposes and as a portfolio project.  
 
 ## Features (Planned)
