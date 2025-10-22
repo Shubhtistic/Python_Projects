@@ -13,8 +13,8 @@ TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
 
 # our defined keywords to search for
-KEYWORDS_TO_SEARCH = ["#python", "#developer"]
-MINIMUM_LIKE_COUNT = 20
+KEYWORDS_TO_SEARCH = ["#Python", "#C++","#Rust"]
+MINIMUM_LIKE_COUNT = 500
 
 # to see if all info is loaded properly
 if not all([TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET]):
