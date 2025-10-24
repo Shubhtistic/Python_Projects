@@ -1,8 +1,6 @@
 import tweepy
-import config
-print(config.TWITTER_ACCESS_TOKEN)
-print(config.TWITTER_API_KEY)
-print(config.TWITTER_BEARER_TOKEN)
+from . import config
+
 ## we are tryig to implement an backoff factor for that we need the time module
 import time
 # what is back-off factor it is exponential
@@ -41,12 +39,12 @@ class X_Client:
             # loger error -> print("all attempts done")
             raise RuntimeError("All authentication attempts failed. Program terminating.")
 
-    def search_recent_tweets(self):
+    def return_recent_tweets(self,queries,max_results_limit, sort_order="relevancy",tweet_fields=["public_metrics", "created_at", "lang"]):
         try:
-            queries=" OR ".join(config.KEYWORDS_TO_SEARCH)
-            # The API treats the query string as a boolean search
-            #"OR" is a logical operator in Twitter search queries
-            responses=self.client.search_recent_tweets(query=queries,max_results=10,tweet_fields=["public_metrics"])
+            responses = self.client.search_recent_tweets(query=queries,
+                                                         max_results=max_results_limit,
+                                                         sort_order=sort_order,
+                                                         tweet_fields=tweet_fields)
             tweets=responses.data
             tweets_list=list()
             if tweets:
@@ -56,7 +54,7 @@ class X_Client:
         except tweepy.TweepyException as e:
             # loggig log error problem in search recent {e}
             print(f"Error: {e}")
-            return [] ## empty list returned  fail
+            return [] ## empty list returned
 
     def retweet(self,tweet_id):
         try:
@@ -67,6 +65,63 @@ class X_Client:
             # logging object -> error print(e)
             print(f"Logging Failed: {e}")
             return False
+        
+    def get_recent_mentions(self, max_results):
+        """
+        Returns a list of dicts with:
+        tweet_id: ID of the mention tweet
+        mentioner_id: ID of the user who mentioned the bot
+        mentioner_username: username of the user who mentioned the bot
+        tweet_text: text content of the mention
+        """
+        mentions_list = list()
+        try:
+            mentions_response = self.client.get_users_mentions(
+                id=self.client.get_me().data.id,
+                max_results=max_results,
+                tweet_fields=["created_at", "lang", "public_metrics", "author_id"]
+            )
+
+            mentions = mentions_response.data
+            if mentions:
+                for mention in mentions:
+                    user_info = self.client.get_user(id=mention.author_id)
+                    mentions_list.append({
+                        "tweet_id": mention.id,                  
+                        "mentioner_id": mention.author_id,       
+                        "mentioner_username": user_info.data.username, 
+                        "tweet_text": mention.text               
+                    })
+                    time.sleep(1.2)
+                    # we repeatedly call it in loop so we pause a bit to avoid X rate limits
+            return mentions_list
+
+        except tweepy.TweepyException as e:
+            print(f"Error in fetching mentions: {e}")
+            return []
+
+    def reply_to_tweet(self, reply_text, tweet_id_to_reply, mentioner_username):
+        """
+        parameters:
+        - reply_text: the message you want to send
+        - tweet_id_to_reply: ID of the tweet you are replying to
+        - mentioner_username: username of the person who mentioned you
+        """
+        try:
+            # include the mentioner so they get ntified
+            final_reply = f"@{mentioner_username} {reply_text}"
+
+            self.client.create_tweet(
+                text=final_reply,
+                in_reply_to_tweet_id=tweet_id_to_reply
+            )
+
+            print(f"Replied successfully to tweet {tweet_id_to_reply} (mentioning @{mentioner_username})")
+            return True
+        except tweepy.TweepyException as e:
+            print(f"Failed to reply to tweet {tweet_id_to_reply}: {e}")
+            return False
+
 
     @property
     def client(self):
