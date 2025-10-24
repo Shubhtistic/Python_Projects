@@ -14,11 +14,17 @@ TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
 
 # our defined keywords to search for
 KEYWORDS_TO_SEARCH = ["#Python", "#C++","#Rust"]
-MINIMUM_LIKE_COUNT = 500
+MINIMUM_LIKE_COUNT = 20
+MINIMUM_RETWEET_COUNT=3
+MAXIMUM_RESULTS_TO_SEARCH=10
 
+
+MAXIMUM_MENTIONS_TO_FIND=10
 # to see if all info is loaded properly
 if not all([TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET]):
     raise ValueError("Missing one or more required Twitter API v1.0a credentials in .env file")
 
 ## the program will not start is there is any error with credentials 
 ## raise value error
+
+GEMINI_API_KEY=os.getenv("GEMINI_API_KEY")
