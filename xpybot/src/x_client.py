@@ -1,5 +1,6 @@
 import tweepy
 from . import config
+import sys
 
 ## we are tryig to implement an backoff factor for that we need the time module
 import time
@@ -121,7 +122,15 @@ class X_Client:
         except tweepy.TweepyException as e:
             print(f"Failed to reply to tweet {tweet_id_to_reply}: {e}")
             return False
-
+    def post_tweet(self,text_to_post:str)->bool:
+        """post an original top level text"""
+        try:
+            self.client.create_tweet(text=text_to_post)
+            print(f"Successfully posted a new tweet: {text_to_post[:50]}...")
+            return True
+        except tweepy.TweepyException as e:
+            print(f"Failed to make post: {e}", file=sys.stderr)
+            return False
 
     @property
     def client(self):
