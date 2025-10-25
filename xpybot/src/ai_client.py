@@ -1,5 +1,5 @@
 import google.generativeai as gemini
-from src import config
+from . import config
 import sys
 import google.api_core.exceptions as google_exceptions
 class AI_Client:

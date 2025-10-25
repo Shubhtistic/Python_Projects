@@ -1,7 +1,7 @@
-from x_client import X_Client
-from ai_client import AI_Client
-from database import Json_DB
-import src.config as cf
+from ..x_client import X_Client
+from ..ai_client import AI_Client
+from ..database import Json_DB
+from .. import config as cf
 
 class AI_Reply:
     def __init__(self,x_client:X_Client,ai_client:AI_Client,db:Json_DB):

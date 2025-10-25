@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from ..x_client import X_Client
 from ..database import Json_DB
-import src.config as cf
+from .. import config as cf
 
 
 
