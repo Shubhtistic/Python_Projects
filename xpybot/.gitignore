@@ -1,3 +1,5 @@
 .retweets.json
 .replies.json
 .data_track.json
+.processed_tweets.json
+xpybot.log
