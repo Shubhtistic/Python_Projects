@@ -14,6 +14,7 @@ def logger():
     # Levels =>  DEBUG < INFO < WARNING < ERROR < CRITICAL
     # now the logger can take messages we need to tell it where to store or display them
 
+
     if log.hasHandlers():
         log.handlers.clear()
     #Explanation:-
@@ -30,6 +31,19 @@ def logger():
 
         log_file.setLevel(logging.DEBUG)
         # all messaggges debug and above will go in this file
+        # Why use DEBUG now?
+        # because DEBUG is noisy, tweepy logs are big error traceback is big
+        # this is normal for DEBUG level, it shows everything.
+        # our INFO message (from our code) is still one line.
+        # DEBUG just saves more stuff from libraries.
+        # What happens if use INFO instead
+        # if we change log_config.py file_handler.setLevel(logging.INFO)
+        # then xpybot.log file ONLY get INFO, WARNING, ERROR, CRITICAL.
+        # NO DEBUG messages saved.
+        # log file looks clean mostly one line
+        # BUT
+        # we lose all the DEBUG details from tweepy.
+        # cannot see traceback for errors maybe.
 
         file_format=logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         # our decided time format
