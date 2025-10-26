@@ -20,7 +20,7 @@ MAXIMUM_RESULTS_TO_SEARCH=10
 
 
 MIN_AGE_HOURS = 0.25  # 15 minutes
-MAX_AGE_HOURS = 48   # 12 hours
+MAX_AGE_HOURS = 48   # 48 hours
 
 
 
