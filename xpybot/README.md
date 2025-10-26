@@ -55,11 +55,12 @@ XpyBot is a modular Python-based bot designed to interact with the X API (former
     pip install -r requirements.txt
     ```
 4.  **Configure Environment Variables:**
-    * Copy `.env.example` to `.env`:
-        ```bash
-        cp .env.example .env
-        ```
-    * Edit the `.env` file and add your actual API keys obtained from the respective developer portals:
+
+      Copy `.env.example` to `.env`:
+    ```bash
+    cp .env.example .env
+    ```
+    - Edit the `.env` file and add your actual API keys obtained from the respective developer portals:
         * `TWITTER_API_KEY`
         * `TWITTER_API_SECRET`
         * `TWITTER_ACCESS_TOKEN`
