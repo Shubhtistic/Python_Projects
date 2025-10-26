@@ -33,7 +33,7 @@ class X_Client:
                                              access_token_secret=config.TWITTER_ACCESS_TOKEN_SECRET,
                                              bearer_token=config.TWITTER_BEARER_TOKEN)
                 # break if success
-                break 
+                break
             except tweepy.TweepyException as e:
                 wait_time=BACKOFF_FACTOR**attempt
                 logger.warning(f"Authentication attempt {attempt} failed: {e}. Retrying in {wait_time}s...")
@@ -57,19 +57,19 @@ class X_Client:
                     tweets_list.append(tweet)
             return tweets_list
         except tweepy.TweepyException as e:
-            
+
             logger.error(f"Error: {e}", exc_info=True)
             return [] ## empty list returned
 
     def retweet(self,tweet_id):
         try:
             response=self.client.retweet(tweet_id)
-            
+
             return True
         except tweepy.TweepyException as e:
             logger.error(f"Logging Failed: {e}", exc_info=True)
             return False
-        
+
     def get_recent_mentions(self, max_results):
         """
         Returns a list of dicts with:
@@ -83,21 +83,39 @@ class X_Client:
             mentions_response = self.client.get_users_mentions(
                 id=self.client.get_me().data.id,
                 max_results=max_results,
-                tweet_fields=["created_at", "lang", "public_metrics", "author_id"]
+                tweet_fields=["created_at", "lang", "public_metrics", "author_id"],
+                expansions=["author_id"],
+                user_fields=["username"]
             )
 
             mentions = mentions_response.data
-            if mentions:
-                for mention in mentions:
-                    user_info = self.client.get_user(id=mention.author_id)
-                    mentions_list.append({
-                        "tweet_id": mention.id,                  
-                        "mentioner_id": mention.author_id,       
-                        "mentioner_username": user_info.data.username, 
-                        "tweet_text": mention.text               
-                    })
-                    time.sleep(2)
-                    # we repeatedly call it in loop so we pause a bit to avoid X rate limits
+            users = {} # Initialize users dictionary
+
+            # Check if mentions exist first
+            if not mentions:
+                logger.debug("No new mentions found.")
+                return []
+
+            # Now safely check for included user data
+            if mentions_response.includes and 'users' in mentions_response.includes:
+                 users = {user.id: user for user in mentions_response.includes['users']}
+
+            for mention in mentions:
+                author_id = mention.author_id
+                author_user_obj = users.get(author_id, None)
+                if author_user_obj is None:
+                    logger.warning(f"Could not find user details for author_id {author_id} in includes. Skipping mention {mention.id}.")
+                    continue
+                author_username = author_user_obj.username
+
+
+                mentions_list.append({
+                    "tweet_id": mention.id,
+                    "mentioner_id": author_id,
+                    "mentioner_username": author_username,
+                    "tweet_text": mention.text
+                })
+            logger.debug(f"Fetched {len(mentions_list)} mentions with user data.")
             return mentions_list
 
         except tweepy.TweepyException as e:
