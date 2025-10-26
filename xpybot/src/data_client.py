@@ -68,11 +68,9 @@ class Data_Client:
             advice = data.get('slip', {}).get('advice')
             if not advice:
                 logger.warning("response missing 'advice' field.")
-                return None
-            return advice
+            return f"Here's a piece of advice:\n{advice}"
         except Exception as e:
             logger.error(f"Api error: {e}", exc_info=True)
-            return f"Here's a piece of advice:\n{advice}"
 
     def _get_joke(self) -> str | None:
         """fetches a single joke from the JokeAPI."""
