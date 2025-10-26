@@ -86,10 +86,9 @@ class Data_Client:
             if not joke:
                 logger.warning("response missing 'joke' field")
                 return None
-            return joke
+            return f"Here's a random joke:\n{joke}"
         except Exception as e:
             logger.error(f"JokeAPI Error: {e}", exc_info=True)
-            return f"Here's a random joke:\n{joke}"
             
     def get_random_data(self) -> str | None:
             
@@ -97,16 +96,5 @@ class Data_Client:
             this is the only public function, all others are private"""
             logger.info("Deciding Which Api to call")
         
-            choice = random.randint(1, 4)
-            if choice == 1:
-                logger.info("Choice (1/4): Useless Fact")
-                return self._get_useless_fact()
-            elif choice == 2:
-                logger.info("Choice (2/4): Dad Joke")
-                return self._get_dad_joke()
-            elif choice == 3:
-                logger.info("Choice (3/4): Advice")
-                return self._get_advice()
-            else: # Choice is 4
-                logger.info("Choice (4/4): General Joke")
-                return self._get_joke()
+            choice = random.choice([self._get_useless_fact,self._get_dad_joke,self._get_advice,self._get_joke])
+            return choice()
