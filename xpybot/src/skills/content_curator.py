@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from ..x_client import X_Client
 from ..database import Json_DB
 from .. import config as cf
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 #Dependency Injection in simple terms
@@ -21,65 +23,75 @@ class Content_Curator:
         query_parts = [f"({keyword})" for keyword in cf.KEYWORDS_TO_SEARCH]
         # list comprehension
         # each keyword will be wrapped in ()
-        query = " OR ".join(query_parts) + " -is:retweet -is:reply -is:quote lang:en has:hashtags has:links"
+        query = " OR ".join(query_parts) + " -is:retweet -is:reply -is:quote lang:en has:hashtags has:links is:verified"
         max_res=cf.MAXIMUM_RESULTS_TO_SEARCH
         # max results to search for
         tweets=self._x_client.return_recent_tweets(query,max_res)
 
         if not tweets:
-            print("No tweets found in this criteria")
-            print("Exiting ..........")
+            logger.info("No tweets found in this criteria")
+            logger.info("Exiting ..........")
             return
         rt_count=0 # retweet count
         p_count=0 # processed count
         for tweet in tweets:
             p_count += 1
             tweet_id = str(tweet.id)
-            if isinstance(tweet.public_metrics, dict):
+            if tweet.public_metrics is not None:
                 like_count = tweet.public_metrics.get('like_count', 0)
                 retweet_count = tweet.public_metrics.get('retweet_count', 0)
             else:
                 like_count = 0
                 retweet_count = 0
 
-            print("--------------------------------------------------------------------------")
-            print(f"Evaluating tweet {tweet_id} (Likes: {like_count}, Retweets: {retweet_count})...")
+            logger.info("--------------------------------------------------------------------------")
+            logger.info(f"Evaluating tweet {tweet_id} (Likes: {like_count}, Retweets: {retweet_count})...")
 
             if self._db.is_processed(tweet_id):
-                print(f"  - Status: Already processed. Skipping.")
+                logger.info(f"Status :- Already processed, Skipping....")
                 continue
 
             if like_count < cf.MINIMUM_LIKE_COUNT or retweet_count < cf.MINIMUM_RETWEET_COUNT:
-                print(f"  - Status: Not popular enough (Likes: {like_count} ). Skipping...")
+                logger.info(f"Status: Not popular enough (Likes: {like_count} ), Skipping...")
                 continue
 
             try:
-                tweet_time = datetime.fromisoformat(tweet.created_at.replace('Z', '+00:00'))
-                # tweet.created_at returns in iso format like 2025-10-24T08:15:30Z and sometimes it may fail(failed once in our code) so lets wrap in try block
-                # with .replace() converts it to python equivalent utc format
-                # datetime.fromisoformat conevrts it to python datetime object
+                if not tweet.created_at:
+                    logger.warning(f"Status: Tweet {tweet_id} missing created_at field, Skipping....")
+                    continue
+
+                MIN_AGE_HOURS = 0.25  # 15 minutes
+                MAX_AGE_HOURS = 12    # 12 hours
+                tweet_time = tweet.created_at
+            
                 age_hours = (datetime.now(timezone.utc) - tweet_time).total_seconds() / 3600
                 # datetime.now() cuurent time 
-                # subtract it with tweet_time to getcuurent time of post and divide by 3600 to get in value in hours
+                # subtract it with tweet_time to get cuurent time of post and divide by 3600 to get in value in hours
                 # 1 hour = 3600 seconds
-            except Exception:
-                print(f"  - Status: Could not parse created_at for tweet {tweet_id}. Skipping.")
-                continue
-            if age_hours < 2:
-                print("Status: Too new, Skipping.")
+
+                if age_hours < MIN_AGE_HOURS:
+                    logger.info(f"Status: Too new ({age_hours:.2f}h). Waiting for it to mature. Skipping..")
+                    continue
+                
+                if age_hours > MAX_AGE_HOURS:
+                    logger.info(f"Status: Too old ({age_hours:.2f}h). Skipping.")
+                    continue
+            except Exception as e:
+                logger.warning(f"Status: Error processing age for tweet {tweet_id}, Error: {e} Skipping..", exc_info=True)
                 continue
 
-            print("It Is new and unique, Attempting retweet")
+
+            logger.info("It Is new and unique, Attempting retweet")
             success = self._x_client.retweet(tweet_id)
             if success:
                 self._db.add_processed_id(tweet_id)
                 rt_count += 1
-                print(f"Success! Retweeted and recorded tweet {tweet_id}.")
+                logger.info(f"Success! Retweeted and recorded tweet {tweet_id}.")
                 time.sleep(3)
             else:
-                print(f"Failed to retweet tweet {tweet_id}.")
+                logger.error(f"Failed to retweet tweet {tweet_id}.")
                 time.sleep(2)
 
-        print(f"\n--- Content Curator Finished ---")
-        print(f"Processed {p_count} tweets found.")
-        print(f"Successfully retweeted {rt_count} new tweets.")
+        logger.info(f"\n--- Content Curator Finished ---")
+        logger.info(f"Processed {p_count} tweets found.")
+        logger.info(f"Successfully retweeted {rt_count} new tweets.")
