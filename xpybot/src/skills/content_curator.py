@@ -60,8 +60,8 @@ class Content_Curator:
                     logger.warning(f"Status: Tweet {tweet_id} missing created_at field, Skipping....")
                     continue
 
-                MIN_AGE_HOURS = 0.25  # 15 minutes
-                MAX_AGE_HOURS = 12    # 12 hours
+                MIN_AGE_HOURS=cf.MIN_AGE_HOURS
+                MAX_AGE_HOURS=cf.MAX_AGE_HOURS
                 tweet_time = tweet.created_at
             
                 age_hours = (datetime.now(timezone.utc) - tweet_time).total_seconds() / 3600
