@@ -1,6 +1,7 @@
 import tweepy
 from . import config
 import sys
+import logging
 
 ## we are tryig to implement an backoff factor for that we need the time module
 import time
@@ -12,10 +13,15 @@ import time
 # first attemp 2 ** 1 = wait 2 seconds
 # second attemp 2**2 = wait 4 seconds and so on ......
 # Helps avoid hammering the API if it’s temporarily down
+
+logger = logging.getLogger(__name__)
+
 MAX_RETRIES=3
 BACKOFF_FACTOR=1.5 # time.sleep() can easily handles floats
 
 # also try using @Property decorator
+
+
 class X_Client:
     def __init__(self):
         self._client=None
@@ -26,18 +32,16 @@ class X_Client:
                                              access_token=config.TWITTER_ACCESS_TOKEN,
                                              access_token_secret=config.TWITTER_ACCESS_TOKEN_SECRET,
                                              bearer_token=config.TWITTER_BEARER_TOKEN)
-                # imp for future
-                # logger object(info) -> ("Twitter client authenticated successfully.")
+                # break if success
                 break 
             except tweepy.TweepyException as e:
                 wait_time=BACKOFF_FACTOR**attempt
-                # in future
-                # loger warining (f"Authentication attempt {attempt} failed: {e}. Retrying in {wait_time}s...")
+                logger.warning(f"Authentication attempt {attempt} failed: {e}. Retrying in {wait_time}s...")
                 time.sleep(wait_time)
                 ## the program pauses(sleeps) for the given time from wait_time
         else:
             ## for else block -> else only runs if the loop completed fully in our case all tries exhausted
-            # loger error -> print("all attempts done")
+            logger.critical("all attempts done")
             raise RuntimeError("All authentication attempts failed. Program terminating.")
 
     def return_recent_tweets(self,queries,max_results_limit, sort_order="relevancy",tweet_fields=["public_metrics", "created_at", "lang"]):
@@ -53,8 +57,8 @@ class X_Client:
                     tweets_list.append(tweet)
             return tweets_list
         except tweepy.TweepyException as e:
-            # loggig log error problem in search recent {e}
-            print(f"Error: {e}")
+            
+            logger.error(f"Error: {e}", exc_info=True)
             return [] ## empty list returned
 
     def retweet(self,tweet_id):
@@ -63,8 +67,7 @@ class X_Client:
             
             return True
         except tweepy.TweepyException as e:
-            # logging object -> error print(e)
-            print(f"Logging Failed: {e}")
+            logger.error(f"Logging Failed: {e}", exc_info=True)
             return False
         
     def get_recent_mentions(self, max_results):
@@ -93,12 +96,12 @@ class X_Client:
                         "mentioner_username": user_info.data.username, 
                         "tweet_text": mention.text               
                     })
-                    time.sleep(1.2)
+                    time.sleep(2)
                     # we repeatedly call it in loop so we pause a bit to avoid X rate limits
             return mentions_list
 
         except tweepy.TweepyException as e:
-            print(f"Error in fetching mentions: {e}")
+            logger.error(f"Error in fetching mentions: {e}", exc_info=True)
             return []
 
     def reply_to_tweet(self, reply_text, tweet_id_to_reply, mentioner_username):
@@ -117,19 +120,19 @@ class X_Client:
                 in_reply_to_tweet_id=tweet_id_to_reply
             )
 
-            print(f"Replied successfully to tweet {tweet_id_to_reply} (mentioning @{mentioner_username})")
+            logger.info(f"Replied successfully to tweet {tweet_id_to_reply} (mentioning @{mentioner_username})")
             return True
         except tweepy.TweepyException as e:
-            print(f"Failed to reply to tweet {tweet_id_to_reply}: {e}")
+            logger.error(f"Failed to reply to tweet {tweet_id_to_reply}: {e}", exc_info=True)
             return False
     def post_tweet(self,text_to_post:str)->bool:
         """post an original top level text"""
         try:
             self.client.create_tweet(text=text_to_post)
-            print(f"Successfully posted a new tweet: {text_to_post[:50]}...")
+            logger.info(f"Successfully posted a new tweet: {text_to_post[:50]}...")
             return True
         except tweepy.TweepyException as e:
-            print(f"Failed to make post: {e}", file=sys.stderr)
+            logger.error(f"Failed to make post: {e}", exc_info=True)
             return False
 
     @property
