@@ -1,6 +1,9 @@
 import json
 from pathlib import Path as pt
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Json_DB:
     def __init__(self,filename:str =".processed_retweets.json"):
@@ -18,18 +21,18 @@ class Json_DB:
                         self._processed_ids.update(str(item) for item in loaded_data)
                     else:
                         self._processed_ids=set()
-                        print(f"Warning: Expected a list in {self._filepath}, but found {type(loaded_data)}. Starting fresh.", file=sys.stderr)
+                        logger.warning(f"Warning: Expected a list in {self._filepath}, but found {type(loaded_data)}. Starting fresh.")
                     # In print(..., file=sys.stderr), file tells Python where to send the output
                     #sys.stderr means the message goes to the error/warning stream instead of normal output
         except json.JSONDecodeError:
             
             # case when file exists but the json format is not of proper format
-            print(f"Warning: Error decoding JSON from {self._filepath}. Starting fresh.", file=sys.stderr)
+            logger.warning(f"Warning: Error decoding JSON from {self._filepath}. Starting fresh.")
             self._processed_ids = set() # start with empty set
             
         except Exception as e:
             # catch any other unexpected file reading errors
-            print(f"Error loading data from {self._filepath}: {e}", file=sys.stderr)
+            logger.error(f"Error loading data from {self._filepath}: {e}", exc_info=True)
             self._processed_ids = set() 
     def _save(self):
         try:
@@ -40,7 +43,7 @@ class Json_DB:
                 json.dump(ids_list,fl,indent=4,ensure_ascii=False)
         except Exception as e:
             # catch any unexpected file writing errors.
-            print(f"Error saving data to {self._filepath}: {e}", file=sys.stderr)
+            logger.error(f"Error saving data to {self._filepath}: {e}", exc_info=True)
     def add_processed_id(self,tweet_id):
         # adding an inviual id to processed_ids set
         str_id=str(tweet_id)
