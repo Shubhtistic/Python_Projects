@@ -73,7 +73,7 @@ def run_bot():
 
     try:
         logger.info("\nRunning Skill 1: Content Curator")
-        curator_skill.do_retweet()
+        # curator_skill.do_retweet()
     except Exception as e:
         logger.error(f"ERROR: Content Curator skill failed: {e}", exc_info=True) 
 
