@@ -24,14 +24,10 @@ XpyBot is a modular Python-based bot designed to interact with the X API (former
 
 ## Tech Stack
 
-* **Language:** Python 3.12
-* **Core Libraries:**
-    * `tweepy`: For interacting with the X API v2.
-    * `google-generativeai`: For interacting with the Google Gemini API.
-    * `requests`: For fetching data from public APIs (used by `Data_Client`).
-    * `python-dotenv`: For loading environment variables from the `.env` file.
-* **Scheduling:** `cron` (recommended for Linux VPS deployment).
-* **Deployment:** AWS EC2 (Ubuntu Linux recommended).
+* **Core:** Python 3.12, Git
+* **APIs & Libraries:** Tweepy, Google Generative AI (Gemini), Requests, Boto3
+* **Deployment (AWS):** Lambda, S3 (for state persistence), EventBridge (Scheduler), CloudWatch (Logging), IAM (Permissions), SNS (Alerts)
+* **State & Config:** JSON, `.env`
 
 ---
 
@@ -55,12 +51,11 @@ XpyBot is a modular Python-based bot designed to interact with the X API (former
     pip install -r requirements.txt
     ```
 4.  **Configure Environment Variables:**
-
-      Copy `.env.example` to `.env`:
-    ```bash
-    cp .env.example .env
-    ```
-    - Edit the `.env` file and add your actual API keys obtained from the respective developer portals:
+    * Copy `.env.example` to `.env`:
+        ```bash
+        cp .env.example .env
+        ```
+    * Edit the `.env` file and add your actual API keys obtained from the respective developer portals:
         * `TWITTER_API_KEY`
         * `TWITTER_API_SECRET`
         * `TWITTER_ACCESS_TOKEN`
@@ -89,3 +84,11 @@ To run the bot manually from your project root directory (`xpybot/`):
 
 ```bash
 python3 -m src.main
+```
+## Deployment (AWS Serverless)
+
+- This application is designed for a stateless, serverless deployment on AWS. The architecture is as follows:
+
+- The core logic is executed by AWS Lambda, which is triggered 4x daily by an Amazon EventBridge Scheduler cron job (0 1,7,13,19 * * ? * in Asia/Kolkata timezone). To maintain state between these stateless runs, all state files (e.g., .replies.json) are persisted in a private Amazon S3 bucket.
+
+- All API keys and resource names are securely managed via Lambda environment variables. Monitoring is handled by Amazon CloudWatch, which captures all print() output, and Amazon SNS, which sends email alerts on run success or failure. An IAM Role provides the Lambda function with least-privilege permissions to S3, CloudWatch, and SNS.
