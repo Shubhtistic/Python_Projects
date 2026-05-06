@@ -1,4 +1,4 @@
-# Python Skill-Building Exercises 🐍
+# Python Skill-Building Exercises
 
 A collection of focused, single-purpose scripts and CLI tools. Each folder is a standalone exercise targeting a specific Python skill or library — the foundational building blocks behind larger applications.
 
