@@ -1,4 +1,4 @@
-# Python Learning Portfolio 🐍
+# Python Learning Portfolio
 
 This repository serves as a comprehensive portfolio of my work and progress as I advance my skills in the Python programming language. It contains a collection of standalone projects, each designed to master specific, industry-relevant concepts.
 

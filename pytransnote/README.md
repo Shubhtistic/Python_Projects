@@ -1,117 +1,99 @@
-# PyTransNote: A Python CLI Translation Manager 🐍
+# PyTransNote — CLI Translation Manager
 
-## 📝 Summary
-PyTransNote is a robust, command-line CRUD application for translating text and managing a persistent history of all translations. It is built with a professional, multi-tier (Model-View-Controller) architecture that emphasizes clean code, separation of concerns, and robust error handling.
-
-The application uses the `deep-translator` library to interface with free, publicly available translation services and persists all user data locally to a hidden JSON file, correctly handling multi-language (Unicode) characters.
+A command-line CRUD application for translating text and managing a persistent translation history. Built with a multi-tier MVC architecture focused on clean code, separation of concerns, and robust error handling.
 
 ---
 
-## ✨ Key Features
-- **Full CRUD Functionality**: **C**reate new translations, **R**ead the full history, and **D**elete specific or all entries.
-- **Persistent Storage**: All translations are automatically saved to a hidden `.history.json` file, ensuring user data is never lost between sessions.
-- **Unique ID System**: Each translation is assigned a permanent, unique ID that is never reused, even after entries are deleted. This provides a stable and reliable way to reference data.
-- **Polished CLI**: A user-friendly and professional command-line interface powered by the `rich` library, featuring colored feedback and beautifully formatted tables.
-- **Multi-Language Support**: Capable of translating between a wide variety of languages supported by the chosen backend engine.
+## Features
+
+- **Full CRUD** — Create translations, read full history, delete specific or all entries
+- **Persistent Storage** — Translations are saved to a hidden `.history.json` file and persist across sessions
+- **Unique ID System** — Each entry gets a permanent ID that is never reused, even after deletion
+- **Polished CLI** — Colored feedback and formatted tables powered by `rich`
+- **Multi-Language Support** — Translates between all languages supported by the active backend engine
 
 ---
 
-## 🛠️ Core Concepts & Architecture
-This project was architected to demonstrate a strong command of modern Python and professional software design patterns.
+## Architecture
 
-- **Model-View-Controller (MVC) Architecture**:
-  - **Model/Services (`history_manager.py`, `manager.py`):** The core business logic and data management are fully encapsulated. These components have no knowledge of the user interface.
-  - **View (`console_view.py`):** A "dumb" component responsible for all user interaction (`print`/`input`). It takes data from the Controller and displays it.
-  - **Controller (`main.py`):** Orchestrates the entire application, managing the flow of data between the Model and the View.
-- **Object-Oriented Design (OOP)**: The application is built with distinct classes, each adhering to the **Single Responsibility Principle**.
-- **Robust Data & Error Handling**:
-  - **File I/O with JSON**: Reads and writes to a JSON file using explicit `utf-8` encoding to fully support international characters.
-  - **`try-except` Blocks**: Gracefully handles potential errors from file operations, user input conversion, and external API calls (e.g., network failures, rate limits).
-- **Professional Python Tooling**:
-  - **Dependency Management**: Uses a project-specific virtual environment (`.venv`) and a `requirements.txt` file.
-  - **Testing Structure**: The project is structured with a `tests/` directory to facilitate unit testing of the core business logic.
+**MVC Pattern:**
+- **Model / Services** (`history_manager.py`, `manager.py`) — Business logic and data management, fully decoupled from the UI
+- **View** (`console_view.py`) — Handles all user interaction (`print` / `input`), receives data from the Controller
+- **Controller** (`main.py`) — Orchestrates data flow between Model and View
+
+**Other Design Decisions:**
+- Classes follow the Single Responsibility Principle
+- JSON file I/O uses explicit `utf-8` encoding for full Unicode support
+- `try-except` blocks handle file errors, input conversion failures, and API issues (network failures, rate limits)
+- `tests/` directory included for unit testing core business logic
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
+
 - **Python 3**
-- **Libraries:**
-  - `deep-translator`: For translation functionality.
-  - `rich`: For the polished CLI and table formatting.
+- `deep-translator` — Translation API integration
+- `rich` — CLI formatting and tables
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### Prerequisites
-- Python 3.8+
-- Git
+**Prerequisites:** Python 3.8+, Git
 
-### Installation & Setup
-1.  **Clone the repository:**
-    ```bash
-    git clone git@github.com:Shubhtistic/Python_Projects.git
-    cd pytransnote
-    ```
-2.  **Create and activate the virtual environment:**
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    ```
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+# Clone and navigate
+git clone git@github.com:Shubhtistic/Python_Projects.git
+cd pytransnote
 
----
+# Set up virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
 
-## 🎬 Usage
-Run the application from the root directory:
+# Install dependencies
+pip install -r requirements.txt
+```
+
+**Run the app:**
 ```bash
 python3 pytransnote/main.py
 ```
 
-## 🔌 Switchable Translation Engines
+---
 
-This project is designed to be engine-agnostic. The core CRUD logic is separate from the translation service, making it easy to swap between different backends. The `deep-translator` library supports several, including:
+## Switchable Translation Engines
 
--   **MyMemoryTranslator:** A legitimate free-tier API. Can be used anonymously with a daily limit, or with a free API key (via email sign-up) for a **significantly higher limit**.
--   **GoogleTranslator:** Uses Google's engine via web scraping. High quality, but can be unreliable and may break.
--   **LibreTranslator:** A free and open-source translation engine that does not require an API key.
--   **DeepLTranslator:** A premium-quality engine that requires a free API key (with credit card verification).
+The translation engine is decoupled from the core CRUD logic, making it straightforward to swap backends. Supported engines via `deep-translator`:
 
-You can easily switch the engine by changing just a few lines of code in the application.
+| Engine | Auth Required | Notes |
+|---|---|---|
+| `MyMemoryTranslator` | No (or API key for higher limits) | Current default |
+| `GoogleTranslator` | No | Scraper-based, can be unreliable |
+| `LibreTranslator` | No | Open-source, self-hostable |
+| `DeepLTranslator` | API key (free tier available) | Highest quality |
 
-### Example: How to Swap
+**Switching engines requires changing only a few lines in the source:**
 
 ```python
-# To switch engines, just copy and change appropriate sections in the code
-
-# --- Option 1: MyMemory (Anonymous - Easiest Start, Lower Limit) ---
+# Option 1: MyMemory — Anonymous (current default)
 from deep_translator import MyMemoryTranslator
 translator = MyMemoryTranslator(source='english', target='french')
-# --- Our Project Currently uses this 
 
-# --- Option 2: Google (Anonymous, Unreliable Scraper) ---
+# Option 2: Google — Anonymous scraper
 from deep_translator import GoogleTranslator
 translator = GoogleTranslator(source='english', target='french')
 
-# --- Option 3: LibreTranslate (Anonymous, Open-Source) ---
+# Option 3: LibreTranslate — Open-source
 from deep_translator import LibreTranslator
 translator = LibreTranslator(source='en', target='fr')
 
-# --- Option 4: MyMemory (With API Key - Higher Limit) ---
+# Option 4: MyMemory — With API key
 from deep_translator import MyMemoryTranslator
-my_api_key = "YOUR_MYMEMORY_KEY_HERE"
-translator = MyMemoryTranslator(api_key=my_api_key, source='english', target='french')
+translator = MyMemoryTranslator(api_key="YOUR_KEY", source='english', target='french')
 
-# --- Option 5: DeepL (With API Key - Highest Quality) ---
+# Option 5: DeepL — With API key
 from deep_translator import DeepLTranslator
-my_deepl_key = "YOUR_DEEPL_KEY_HERE" 
-translator = DeepLTranslator(api_key=my_deepl_key, source='en', target='fr', use_free_api=True)
+translator = DeepLTranslator(api_key="YOUR_KEY", source='en', target='fr', use_free_api=True)
 
-
-# =======================================================
-# The rest of your code that calls `translator.translate()` stays the same!
-# =======================================================
+# The translator.translate() call remains the same across all engines.
 ```
